@@ -32,11 +32,6 @@ from network.get_models import get_models
 args = utils.parse_command()
 print(args)
 
-# if setting gpu id, the using single GPU
-if args.gpu:
-    print('Single GPU Mode.')
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-
 best_result = Result()
 best_result.set_to_worst()
 
