@@ -10,7 +10,7 @@ import shutil
 import socket
 import time
 import torch
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from torch.optim import lr_scheduler
 
 from dataloaders import nyu_dataloader, floorplan3d_dataloader
