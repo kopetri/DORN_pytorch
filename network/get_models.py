@@ -9,7 +9,7 @@ from network import DORN_nyu, DORN_kitti
 
 
 def get_models(dataset='nyu', pretrained=True, freeze=True):
-    if dataset == 'nyu':
+    if dataset == 'nyu' or dataset == 'floorplan3d':
         return DORN_nyu.DORN(pretrained=pretrained, freeze=freeze)
     elif dataset == 'kitti':
         return  DORN_kitti.DORN(pretrained=pretrained, freeze=freeze)
