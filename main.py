@@ -13,7 +13,7 @@ import torch
 from tensorboardX import SummaryWriter
 from torch.optim import lr_scheduler
 
-from dataloaders import nyu_dataloader
+from dataloaders import nyu_dataloader, floorplan3d_dataloader
 from dataloaders.kitti_dataloader import KittiFolder
 from dataloaders.path import Path
 from metrics import AverageMeter, Result
@@ -51,7 +51,7 @@ def create_loader(args):
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=1, shuffle=False,
                                                   num_workers=args.workers, pin_memory=True)
         return train_loader, test_loader
-    else:
+    elif args.dataset == 'nyu':
         traindir = os.path.join(root_dir, 'train')
         if os.path.exists(traindir):
             print('Train dataset "{}" is existed!'.format(traindir))
@@ -76,6 +76,32 @@ def create_loader(args):
             val_set, batch_size=1, shuffle=False, num_workers=args.workers, pin_memory=True)
 
         return train_loader, val_loader
+    elif args.dataset == 'floorplan3d':
+        traindir = os.path.join(root_dir)
+        if os.path.exists(traindir):
+            print('Train dataset "{}" is existed!'.format(traindir))
+        else:
+            print('Train dataset "{}" is not existed!'.format(traindir))
+            exit(-1)
+
+        valdir = os.path.join(root_dir)
+        if os.path.exists(traindir):
+            print('Valid dataset "{}" is existed!'.format(valdir))
+        else:
+            print('Valid dataset "{}" is not existed!'.format(valdir))
+            exit(-1)
+
+        train_set = floorplan3d_dataloader.Floorplan3DDataset(traindir, dataset_type=args.dataset_type, split='train')
+        val_set = floorplan3d_dataloader.Floorplan3DDataset(valdir, dataset_type=args.dataset_type, split='val')
+
+        train_loader = torch.utils.data.DataLoader(
+            train_set, batch_size=args.batch_size, shuffle=True, num_workers=args.workers, pin_memory=True)
+
+        val_loader = torch.utils.data.DataLoader(
+            val_set, batch_size=1, shuffle=False, num_workers=args.workers, pin_memory=True)
+        return train_loader, val_loader
+    else:
+        raise ValueError("unknown dataset")
 
 
 def main():

@@ -33,8 +33,8 @@ def parse_command():
                         help='number of data loading workers (default: 10)')
     parser.add_argument('--dataset', default='nyu', type=str,
                         help='dataset used for training, kitti and nyu is available')
+    parser.add_argument('--dataset_type', type=str, default="dataset0")
     parser.add_argument('--manual_seed', default=1, type=int, help='Manually set random seed')
-    parser.add_argument('--gpu', default='1', type=str, help='if not none, use Single GPU')
     parser.add_argument('--print-freq', '-p', default=10, type=int,
                         metavar='N', help='print frequency (default: 10)')
     args = parser.parse_args()
@@ -67,7 +67,11 @@ def get_depth_sid(args, labels):
         K = 71.0
     elif args.dataset == 'nyu':
         min = 0.02
-        max = 80.0
+        max = 10.0
+        K = 68.0
+    elif args.dataset == 'floorplan3d':
+        min = 0.0
+        max = 10.0
         K = 68.0
     else:
         print('No Dataset named as ', args.dataset)
@@ -82,8 +86,11 @@ def get_depth_sid(args, labels):
         K_ = torch.tensor(K)
 
     # print('label size:', labels.size())
-    # depth = torch.exp(torch.log(alpha_) + torch.log(beta_ / alpha_) * labels / K_)
-    depth = alpha_ * (beta_ / alpha_) ** (labels / K_)
+    if not alpha_ == 0.0:
+        depth = torch.exp(torch.log(alpha_) + torch.log(beta_ / alpha_) * labels / K_)
+    else:
+        depth = torch.exp(torch.log(beta_) * labels / K_)
+    # depth = alpha_ * (beta_ / alpha_) ** (labels.float() / K_)
     # print(depth.size())
     return depth.float()
 
@@ -97,6 +104,10 @@ def get_labels_sid(args, depth):
         alpha = 0.02
         beta = 10.0
         K = 68.0
+    elif args.dataset == 'floorplan3d':
+        alpha = 0.0
+        beta = 10.0
+        K = 68.0
     else:
         print('No Dataset named as ', args.dataset)
 
@@ -108,8 +119,10 @@ def get_labels_sid(args, depth):
         alpha = alpha.cuda()
         beta = beta.cuda()
         K = K.cuda()
-
-    labels = K * torch.log(depth / alpha) / torch.log(beta / alpha)
+    if not alpha == 0.0:
+        labels = K * torch.log(depth / alpha) / torch.log(beta / alpha)
+    else:
+        labels = K * torch.log(depth) / torch.log(beta)
     if torch.cuda.is_available():
         labels = labels.cuda()
     return labels.int()

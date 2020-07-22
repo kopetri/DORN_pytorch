@@ -16,7 +16,6 @@ import collections
 import warnings
 
 import scipy.ndimage.interpolation as itpl
-import scipy.misc as misc
 
 
 def _is_numpy_image(img):
@@ -320,10 +319,13 @@ class Resize(object):
             ``PIL.Image.BILINEAR``
     """
 
-    def __init__(self, size, interpolation='nearest'):
+    def __init__(self, size, interpolation=Image.BILINEAR):
         assert isinstance(size, int) or isinstance(size, float) or \
                (isinstance(size, collections.Iterable) and len(size) == 2)
-        self.size = size
+        if isinstance(size, int) or isinstance(size, float):
+            self.size = [size, size]
+        if (isinstance(size, collections.Iterable) and len(size) == 2):
+            self.size = size
         self.interpolation = interpolation
 
     def __call__(self, img):
@@ -333,10 +335,11 @@ class Resize(object):
         Returns:
             PIL Image: Rescaled image.
         """
+        (h, w) = (int(img.shape[0] * self.size[0]), int(img.shape[1] * self.size[1]))
         if img.ndim == 3:
-            return misc.imresize(img, self.size, self.interpolation)
+            return np.asarray(Image.fromarray(img).resize((w, h), resample=self.interpolation))
         elif img.ndim == 2:
-            return misc.imresize(img, self.size, self.interpolation, 'F')
+            return np.asarray(Image.fromarray(img).resize((w, h), resample=self.interpolation))
         else:
             RuntimeError('img should be ndarray with 2 or 3 dimensions. Got {}'.format(img.ndim))
 
