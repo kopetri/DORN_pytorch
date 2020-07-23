@@ -70,7 +70,7 @@ def get_depth_sid(args, labels):
         max = 10.0
         K = 68.0
     elif args.dataset == 'floorplan3d':
-        min = 0.0
+        min = 0.0552
         max = 10.0
         K = 68.0
     else:
@@ -105,7 +105,7 @@ def get_labels_sid(args, depth):
         beta = 10.0
         K = 68.0
     elif args.dataset == 'floorplan3d':
-        alpha = 0.0
+        alpha = 0.0552
         beta = 10.0
         K = 68.0
     else:

@@ -199,7 +199,7 @@ class OrdinalRegressionLayer(nn.Module):
 
         ord_c1 = ord_c[:, 1, :].clone()
         ord_c1 = ord_c1.view(-1, ord_num, H, W)
-        print('ord > 0.5 size:', (ord_c1 > 0.5).size())
+        #print('ord > 0.5 size:', (ord_c1 > 0.5).size())
         decode_c = torch.sum((ord_c1 > 0.5), dim=1).view(-1, 1, H, W)
         # decode_c = torch.sum(ord_c1, dim=1).view(-1, 1, H, W)
         return decode_c, ord_c1
