@@ -8,6 +8,7 @@
 import torch
 import torch.nn as nn
 from torch.nn import BatchNorm2d
+from pathlib import Path
 
 affine_par = True
 
@@ -121,7 +122,12 @@ def resnet101(pretrained=True):
     resnet101 = ResNet(Bottleneck, [3, 4, 23, 3])
 
     if pretrained:
-        saved_state_dict = torch.load('./network/pretrained_models/resnet101-imagenet.pth')
+        weights_file = Path('./network/pretrained_models/resnet101-imagenet.pth').resolve()
+        if not weights_file.exists():
+            import urllib
+            weights_file.parent.mkdir(parents=True)
+            urllib.request.urlretrieve("http://sceneparsing.csail.mit.edu/model/pretrained_resnet/resnet101-imagenet.pth", weights_file.as_posix())
+        saved_state_dict = torch.load(weights_file.as_posix())
         # saved_state_dict = torch.load('./pretrained_models/resnet101-imagenet.pth')
         new_params = resnet101.state_dict().copy()
         for i in saved_state_dict:

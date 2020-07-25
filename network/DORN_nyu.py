@@ -121,31 +121,40 @@ class SceneUnderstandingModule(nn.Module):
         self.encoder = FullImageEncoder()
         self.aspp1 = nn.Sequential(
             nn.Conv2d(2048, 512, 1),
-            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(512),
+            nn.ReLU(inplace=True),            
             nn.Conv2d(512, 512, 1),
-            nn.ReLU(inplace=True)
+            nn.BatchNorm2d(512),
+            nn.ReLU(inplace=True),
         )
         self.aspp2 = nn.Sequential(
             nn.Conv2d(2048, 512, 3, padding=6, dilation=6),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True),
             nn.Conv2d(512, 512, 1),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True)
         )
         self.aspp3 = nn.Sequential(
             nn.Conv2d(2048, 512, 3, padding=12, dilation=12),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True),
             nn.Conv2d(512, 512, 1),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True)
         )
         self.aspp4 = nn.Sequential(
             nn.Conv2d(2048, 512, 3, padding=18, dilation=18),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True),
             nn.Conv2d(512, 512, 1),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True)
         )
         self.concat_process = nn.Sequential(
             nn.Dropout2d(p=0.5),
             nn.Conv2d(512 * 5, 2048, 1),
+            nn.BatchNorm2d(2048),
             nn.ReLU(inplace=True),
             nn.Dropout2d(p=0.5),
             nn.Conv2d(2048, 136, 1),  # KITTI 142 NYU 136 In paper, K = 80 is best, so use 160 is good!
@@ -217,7 +226,6 @@ class DORN(nn.Module):
 
     def forward(self, x):
         x1 = self.feature_extractor(x)
-        # print(x1.size())
         x2 = self.aspp_module(x1)
         # print('DORN x2 size:', x2.size())
         depth_labels, ord_labels = self.orl(x2)
