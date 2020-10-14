@@ -121,8 +121,8 @@ def resnet101(pretrained=True):
     resnet101 = ResNet(Bottleneck, [3, 4, 23, 3])
 
     if pretrained:
-        # saved_state_dict = torch.load('./network/pretrained_models/resnet101-imagenet.pth')
-        saved_state_dict = torch.load('./pretrained_models/resnet101-imagenet.pth')
+        saved_state_dict = torch.load('./network/pretrained_models/resnet101-imagenet.pth')
+        # saved_state_dict = torch.load('./pretrained_models/resnet101-imagenet.pth')
         new_params = resnet101.state_dict().copy()
         for i in saved_state_dict:
             i_parts = i.split('.')
